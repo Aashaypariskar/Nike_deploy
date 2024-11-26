@@ -1,0 +1,188 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<style>
+    /* General Styling */
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    /* Sidebar Styling */
+    .bg-dark {
+        background: linear-gradient(180deg, #222831, #1d2124);
+    }
+    .nav-link {
+        color: #ccc;
+        font-weight: 500;
+    }
+    .nav-link:hover, .nav-link.active {
+        background-color: #343a40;
+        color: #fff;
+        border-radius: 5px;
+        box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Card Styling */
+    .card {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+    .card-header {
+        background: linear-gradient(90deg, #007bff, #0056d2);
+        color: white;
+        font-weight: bold;
+    }
+    .card-body {
+        background-color: #ffffff;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Form Field Styling */
+    .form-control {
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0px 0px 8px rgba(0, 123, 255, 0.5);
+    }
+
+    /* Icon Container */
+    .icon-container {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background-color: #eef2f5;
+    }
+    .icon-container i {
+        font-size: 1.5rem;
+        color: #007bff;
+    }
+
+    /* Button Styling */
+    .btn-gradient-primary {
+        background: linear-gradient(90deg, #0056d2, #007bff);
+        border: none;
+        color: white;
+        padding: 0.6rem 2rem;
+        font-size: 1rem;
+        font-weight: bold;
+        border-radius: 30px;
+        transition: all 0.3s ease;
+    }
+    .btn-gradient-primary:hover {
+        background: linear-gradient(90deg, #007bff, #0056d2);
+        transform: translateY(-2px);
+        box-shadow: 0px 4px 12px rgba(0, 123, 255, 0.3);
+    }
+
+    /* Flash Message Styling */
+    .alert {
+        border-radius: 10px;
+        font-weight: 500;
+        box-shadow: 0px 3px 8px rgba(0, 0, 0, 0.1);
+    }
+</style>
+</head>
+<body>
+
+<div class="container-fluid profile py-5">
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 d-none d-md-block bg-dark text-white vh-100 sticky-top shadow-sm">
+        <nav class="pt-5">
+            <div class="text-center mb-4">
+                <h5 class="text-uppercase fw-bold text-light">Menu</h5>
+            </div>
+            <ul class="nav flex-column px-3">
+                <li class="nav-item mb-3">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" href="{% url 'profile' %}">
+                        <i class="bi bi-person-circle me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-3">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'changepassword' %}active{% endif %}" href="{% url 'changepassword' %}">
+                        <i class="bi bi-shield-lock-fill me-2"></i> Change Password
+                    </a>
+                </li>
+                <li class="nav-item mb-3">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-file-earmark-text me-2"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item mb-3">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-bag-fill me-2"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'address' %}active{% endif %}" href="{% url 'address' %}">
+                        <i class="bi bi-geo-alt-fill me-2"></i> Address
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 mx-auto py-4">
+        <div class="card border-0 shadow-lg">
+            <div class="card-header text-center py-4">
+                <h3 class="mb-0 fw-bold">Profile</h3>
+            </div>
+            <div class="card-body px-5 py-4">
+                <form action="" method="POST" novalidate>
+                    {% csrf_token %}
+
+                    <!-- Non-Field Errors -->
+                    {% if mf.non_field_errors %}
+                        {% for error in mf.non_field_errors %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <!-- Form Fields -->
+                    {% for m in mf %}
+                        <div class="form-group mb-4 d-flex align-items-center">
+                            <div class="icon-container me-3">
+                                <i class="bi bi-{{ m.widget.attrs.icon_class }}"></i>
+                            </div>
+                            <div class="w-100">
+                                <label for="{{ m.id_for_label }}" class="form-label text-dark fw-bold">{{ m.label }}</label>
+                                {{ m }}
+                                {% for error in m.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <!-- Submit Button -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-gradient-primary">
+                            <i class="bi bi-save me-2"></i> Save
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Flash Messages -->
+                {% if messages %}
+                    <div class="mt-4">
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock content %}
